@@ -1,16 +1,13 @@
-"use client";
-import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import CallbackRedirectClient from "./callback-redirect-client";
 
-export default function OAuthCallback() {
-  const searchParams = useSearchParams();
+type CallbackPageProps = {
+  searchParams?: Promise<{ code?: string | string[] }>;
+};
 
-  useEffect(() => {
-    const code = searchParams.get("code");
-    if (code) {
-      window.location.href = `myapp://oauth/callback?code=${code}`;
-    }
-  }, []);
+export default async function OAuthCallback({ searchParams }: CallbackPageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const rawCode = resolvedSearchParams?.code;
+  const code = Array.isArray(rawCode) ? rawCode[0] : rawCode;
 
-  return <p>Redirecting back to app...</p>;
+  return <CallbackRedirectClient code={code} />;
 }
