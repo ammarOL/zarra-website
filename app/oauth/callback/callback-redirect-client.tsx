@@ -22,7 +22,7 @@ export default function CallbackRedirectClient({
       params.set("state", state);
     }
 
-    return `zarra://oauth/callback?${params.toString()}`;
+    return `exp://192.168.29.240:8081/--/oauth/callback?${params.toString()}`;`;
   }, [code, state]);
 
   useEffect(() => {
