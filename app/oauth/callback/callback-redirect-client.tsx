@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 type CallbackRedirectClientProps = {
   code?: string;
@@ -11,9 +11,9 @@ export default function CallbackRedirectClient({
   code,
   state,
 }: CallbackRedirectClientProps) {
-  useEffect(() => {
+  const deepLinkUrl = useMemo(() => {
     if (!code) {
-      return;
+      return null;
     }
 
     const params = new URLSearchParams({ code });
@@ -22,8 +22,16 @@ export default function CallbackRedirectClient({
       params.set("state", state);
     }
 
-    window.location.href = `zarra://oauth/callback?${params.toString()}`;
+    return `zarra://oauth/callback?${params.toString()}`;
   }, [code, state]);
+
+  useEffect(() => {
+    if (!deepLinkUrl) {
+      return;
+    }
+
+    window.location.href = deepLinkUrl;
+  }, [deepLinkUrl]);
 
   if (!code) {
     return (
@@ -45,9 +53,16 @@ export default function CallbackRedirectClient({
         Redirecting back to app…
       </h1>
       <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-[#5f5f79] sm:text-base">
-        If you are not redirected automatically, return to the app and continue
-        from the sign-in screen.
+        If you are not redirected automatically, tap Open Zarra app.
       </p>
+      {deepLinkUrl ? (
+        <a
+          className="mx-auto mt-6 inline-flex rounded-full border border-[#232389] bg-[#232389] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#1e1e73] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5b5bcf] focus-visible:ring-offset-2"
+          href={deepLinkUrl}
+        >
+          Open Zarra app
+        </a>
+      ) : null}
     </main>
   );
 }
